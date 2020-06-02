@@ -1,22 +1,30 @@
-sudo : required
+sudo: required
 services:
-    - docker
-
+- docker
 before_install:
-    - docker build -t anoopviswappan/react-multi-test -f ./client/Dockerfile.dev ./client
-
+- docker build -t anoopviswappan/react-multi-test -f ./client/Dockerfile.dev ./client
 script:
-    - docker run -e CI=true anoopviswappan/react-multi-test npm run test -- --coverage
-
+- docker run -e CI=true anoopviswappan/react-multi-test npm run test -- --coverage
 after_success:
-    - docker build -t anoopviswappan/react-multi-client ./client
-    - docker build -t anoopviswappan/react-multi-nginx ./nginx
-    - docker build -t anoopviswappan/react-multi-server ./server
-    - docker build -t anoopviswappan/react-multi-worker ./worker
-    #Log in to docker cli
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-    #Take those images and push them to docker hub
-    - docker push anoopviswappan/react-multi-client
-    - docker push anoopviswappan/react-multi-nginx
-    - docker push anoopviswappan/react-multi-server
-    - docker push anoopviswappan/react-multi-worker
+- docker build -t anoopviswappan/react-multi-client ./client
+- docker build -t anoopviswappan/react-multi-nginx ./nginx
+- docker build -t anoopviswappan/react-multi-server ./server
+- docker build -t anoopviswappan/react-multi-worker ./worker
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+- docker push anoopviswappan/react-multi-client
+- docker push anoopviswappan/react-multi-nginx
+- docker push anoopviswappan/react-multi-server
+- docker push anoopviswappan/react-multi-worker
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-1
+  app: react-multi-docker
+  env: ReactMultiDocker-env
+  bucket_name: elasticbeanstalk-us-east-1-799208866004
+  bucket_path: react-multi-docker
+  on:
+    branch: master
+  access_key_id:
+    secure: f2fOwi+yQ+gX0jpMVE5p3wNrJs+oOTkx1Bwh1qKoT4PomlY4FwwxD3B+bKFL+9metRoNLfhxUcmD6ig+3hn75BMvL9p5S3fYKv4b5HWADEre42tJ+sQPqOoGWTUJtzK8I9m67kqutz022Gqy/QxjoYEhFa53e3/5K45DMpI2jgKd4ZvkXm63SISd8c+2dLIPMBR8i9F5o7Y2XlELQ+3+PP1B5BUARE7ddHi28761W1HC9CTEgPRCxtkw59Ka3dhnZlp/Cu43B1Wzd4ByV8EyOD6u+isYuP8/xvnp1QVMGyffifYouZSrJJE4R2l/+Ltb5SFmdVmv74c1l5IaSa5VDpBEpRcVxGGjCkKkvKiYsjmiNiIv0xy3JyN1X5nDwoumiKK823iv+F+XyarSqBOR3gpuPDxBT37MKeFkyiyHreP0qFtAr9KtOm0JvWYPekqnp/1HuU1iRYj8ft/jS8isp9sgyTX6dKTA/WnvHVBPD7Iu76orApOLvJWOcF47xl92fxvDF1l/oMsVRR4bhLJfW6ks2+8ELSC6u7f4wIeBdSe31G5ezTy8zV867cxDs0CO3gbsQuN//RiW+Gxyt49KN0ttwZAafu4YEWvctJ0ZWQICn9+XX5QkCWL8ShgrKmu5VMP0lyBR5avg9p3WsUBFlTaihRu732sXyRat7XZEWjU=
+  secret_access_key:
+    secure: RwtqhYBitGtyTu85LVSEX+M/Lu32A9/BCfwFYFKxAhm5CK3GwPg05IZxY1c9nJteJG1Jg+Fq6b2yqQUcoMnjhF2+vg8sGpNR4mvB1zes/+vLKgPQUogyXREYjywa215MBK/WV/G/kpVgrs1KZjH+degWtTgUPL8Ygs3DLnsS36izXWaS8xmob6nx6OuK5MUF+NL8JWCeRRggINj5WIf+KKdNvfCkv1qYUd67a0HaJnxLIR6klx9QDSmZOcOQ2ulvT4AM7kDHFzkmlBJMaE0cOFaGUjQdGuWMbDCWl844RWcFGNx3x5NGqHmuQGgi35ppkZk3SEaMpi3mwQqRA6pdLtL2CHnkl4UTVBIY3FrFK01k8OhqH6SD6l+2db+GkctpjbQnWnSO4RnP/LvMz1faW/rKVdx7V2CB2+nLQZtqAN6KfPqr6qW5f5ypNkMAn1AbP1Ce8e1a9WxwJrFjTwb4K+xKEzeuolC/EfTcExV0pCdsDsNt/lzUHEG54V2xS+FgEplEWzf5koNye+IPB07jLnic4DV0BQqCFChS798KVPmY1o15f4hHDeW7EQlW1joSfIvpxpHBPnzCWi7O6SXBrTEQs2vwl8QIZu11T/hdr6bkbNZE2nZaubB5j8n8TaZ4qzaoDRhqSgYFxJVgP9j3M98KAc4Xg+02OVI523QjZks=
